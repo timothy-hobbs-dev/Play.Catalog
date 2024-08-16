@@ -14,12 +14,8 @@ public class ItemsRepository : IItemsRepository
 
     public ItemsRepository(IMongoDatabase database)
     {
-
-        // var mongoClient = new MongoClient("mongodb://localhost:27017");
-        // var database = mongoClient.GetDatabase("Catalog");
         dbCollection = database.GetCollection<Item>(collectionName);
-        // filterBuilder = Builders<Item>.Filter;
-
+        filterBuilder = Builders<Item>.Filter;
     }
 
     public async Task<IReadOnlyCollection<Item>> GetAllAsync()
