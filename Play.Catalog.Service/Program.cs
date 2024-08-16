@@ -2,6 +2,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using Play.Catalog.Service.Entities;
 using Play.Catalog.Service.Repositories;
 using Play.Catalog.Service.Settings;
 
@@ -23,7 +24,11 @@ var mongoDBSettings = builder.Configuration
 
 var mongoDbClient = new MongoClient(mongoDBSettings.ConnnectionString);
 builder.Services.AddSingleton(mongoDbClient.GetDatabase(serviceSettings.ServiceName));
-builder.Services.AddSingleton<IItemsRepository, ItemsRepository>();
+builder.Services.AddSingleton<IRepository<Item>>(sp =>
+{
+    var db = sp.GetService<IMongoDatabase>();
+    return new MongoRepository<Item>(db!, "items");
+});
 
 
 BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));

@@ -3,22 +3,19 @@ using Play.Catalog.Service.Entities;
 
 namespace Play.Catalog.Service.Repositories;
 
-public class ItemsRepository : IItemsRepository
+public class MongoRepository<T> : IRepository<T> where T : IEntity
 {
+    private readonly IMongoCollection<T> dbCollection;
 
-    private const string collectionName = "items";
+    private readonly FilterDefinitionBuilder<T> filterBuilder;
 
-    private readonly IMongoCollection<Item> dbCollection;
-
-    private readonly FilterDefinitionBuilder<Item> filterBuilder;
-
-    public ItemsRepository(IMongoDatabase database)
+    public MongoRepository(IMongoDatabase database, string collectionName)
     {
-        dbCollection = database.GetCollection<Item>(collectionName);
-        filterBuilder = Builders<Item>.Filter;
+        dbCollection = database.GetCollection<T>(collectionName);
+        filterBuilder = Builders<T>.Filter;
     }
 
-    public async Task<IReadOnlyCollection<Item>> GetAllAsync()
+    public async Task<IReadOnlyCollection<T>> GetAllAsync()
     {
         return await dbCollection.Find(filterBuilder.Empty).ToListAsync();
     }
@@ -28,7 +25,7 @@ public class ItemsRepository : IItemsRepository
     /// </summary>
     /// <param name="id">The ID of the item to be retrieved.</param>
     /// <returns>A task that represents the asynchronous operation, containing the item if found, or null otherwise.</returns>
-    public async Task<Item?> GetAsync(Guid id)
+    public async Task<T?> GetAsync(Guid id)
     {
         var filter = filterBuilder.Eq(item => item.Id, id);
         return await dbCollection.Find(filter).FirstOrDefaultAsync();
@@ -40,7 +37,7 @@ public class ItemsRepository : IItemsRepository
     /// <param name="entity">The item to be created.</param>
     /// <exception cref="ArgumentNullException">Thrown if the entity is null.</exception>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task CreateAsync(Item entity)
+    public async Task CreateAsync(T entity)
     {
         if (entity is null)
         {
@@ -55,7 +52,7 @@ public class ItemsRepository : IItemsRepository
     /// <param name="entity">The item to be updated.</param>
     /// <exception cref="ArgumentNullException">Thrown if the entity is null.</exception>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task UpdateAsync(Item entity)
+    public async Task UpdateAsync(T entity)
     {
         if (entity is null)
         {
