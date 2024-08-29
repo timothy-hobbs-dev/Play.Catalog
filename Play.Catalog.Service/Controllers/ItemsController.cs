@@ -15,7 +15,6 @@ public class ItemsController : ControllerBase
     public ItemsController(IRepository<Item> itemsRepository)
     {
         _itemsRepository = itemsRepository;
-
     }
 
     [HttpGet]
