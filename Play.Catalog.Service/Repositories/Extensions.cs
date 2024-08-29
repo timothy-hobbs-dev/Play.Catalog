@@ -9,7 +9,8 @@ namespace Play.Catalog.Service.Repositories
 {
     public static class Extensions
     {
-        public static void AddMongoDb(this WebApplicationBuilder builder)
+        public static void AddMongoDb<T>(this WebApplicationBuilder builder, string collectionName)
+        where T : IEntity
         {
             var serviceSettings = builder.Configuration
             .GetSection(nameof(ServiceSettings))
@@ -20,10 +21,10 @@ namespace Play.Catalog.Service.Repositories
 
             var mongoDbClient = new MongoClient(mongoDBSettings.ConnnectionString);
             builder.Services.AddSingleton(mongoDbClient.GetDatabase(serviceSettings.ServiceName));
-            builder.Services.AddSingleton<IRepository<Item>>(sp =>
+            builder.Services.AddSingleton<IRepository<T>>(sp =>
             {
                 var db = sp.GetService<IMongoDatabase>();
-                return new MongoRepository<Item>(db!, "items");
+                return new MongoRepository<T>(db!, collectionName);
             });
 
 
