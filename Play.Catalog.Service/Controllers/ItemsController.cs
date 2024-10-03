@@ -80,6 +80,4 @@ public class ItemsController : ControllerBase
         await _itemsRepository.RemoveAsync(id);
         return NoContent();
     }
-
-
 }
